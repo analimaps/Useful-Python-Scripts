@@ -1,0 +1,47 @@
+//It used to run at https://script.google.com to fetch a google sheets and generates a cvs from that
+
+function exportDataToCSV() {
+  // Define the Google Sheet URL
+  var sheetURL = 'https://docs.google.com/spreadsheets/example';
+
+  // Open the Google Sheet by its URL
+  var ss = SpreadsheetApp.openByUrl(sheetURL);
+  
+  // Access the specific sheet by name (not spreadsheet's name)
+  var sheet = ss.getSheetByName('SheetName');
+
+  // Get the data from the sheet
+  var data = sheet.getDataRange().getValues();
+
+   // Extract only the specified fields
+ // var selectedData = data.map(function(row) {
+ //   return [row[0], row[1], row[2], row[3], row[6], row[7]]; // first column is 0
+ // });
+
+  // Create CSV content from the data
+  var csvContent = data.map(function(row) {
+    return row.join(',');
+  }).join('\n');
+
+  // Define the Google Drive folder ID where you want to store the CSV
+  var folderID = '1Yz6A7iRz89ZJ9EkY';
+
+  // Access the destination folder by its ID
+  var folder = DriveApp.getFolderById(folderID);
+
+  // Create a new file with a unique name
+  var fileName = 'NewCSVName.csv';
+
+  // Check if a file with the same name exists in the folder
+var existingFiles = folder.getFilesByName(fileName);
+if (existingFiles.hasNext()) {
+  // Move the existing file to the trash
+  var existingFile = existingFiles.next();
+  existingFile.setTrashed(true);
+}
+
+
+  var file = folder.createFile(fileName, csvContent, MimeType.CSV);
+
+  Logger.log('CSV File created: ' + file.getUrl());
+}
